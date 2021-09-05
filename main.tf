@@ -1,4 +1,3 @@
-
 # Provider que o Terraform irá utilizar
 provider "aws" {
   region = var.region
@@ -59,8 +58,8 @@ resource "aws_security_group" "sg-tomcat-http" {
   ingress = [
     {
       description      = "HTTP access ingress rule"
-      from_port        = 80
-      to_port          = 80
+      from_port        = 8080
+      to_port          = 8080
       protocol         = "tcp"
       cidr_blocks      = ["0.0.0.0/0"]
       ipv6_cidr_blocks = ["::/0"]
@@ -253,13 +252,13 @@ resource "aws_alb" "ec2-alb" {
 # Configuração do target group para o Application Load Balance
 resource "aws_alb_target_group" "ec2-alb-target-group" {
   name     = "ec2-alb-target-group"
-  port     = 80
+  port     = 8080
   protocol = "HTTP"
   vpc_id = aws_default_vpc.default.id
 
   health_check {
     path = "/"
-    port = 80
+    port = 8080
   }
 }
 
@@ -270,7 +269,7 @@ resource "aws_alb_target_group_attachment" "ec2-alb-target-group-attachment" {
 
   target_group_arn = aws_alb_target_group.ec2-alb-target-group.arn
   target_id        = aws_instance.apache-tomcat[count.index].id
-  port             = 80
+  port             = 8080
 }
 
 # Criando um Listener para a porta 80
